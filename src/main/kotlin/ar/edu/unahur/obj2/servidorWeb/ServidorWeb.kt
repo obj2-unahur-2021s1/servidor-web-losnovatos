@@ -16,6 +16,7 @@ class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val p
 class ServidorWeb {
   val protocoloAceptado: String = "http:"
   val modulos = mutableListOf<Modulo>()
+  var pedidosRealizados= mutableListOf<Pedido>()
 
   //Requerimientos 1 y 2 implementados.
 
@@ -27,6 +28,7 @@ class ServidorWeb {
     if(moduloSeleccionado == null) {
       return Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
     }
+    pedidosRealizados.add(pedido)
     return Respuesta(CodigoHttp.OK, moduloSeleccionado.body, moduloSeleccionado.tiempoQueTarda, pedido)
   }
 
