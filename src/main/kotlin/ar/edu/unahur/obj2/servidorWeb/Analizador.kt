@@ -11,6 +11,12 @@ class AnalizadorDeDemora(val demoraMinima:Int) :Analizador(){
 }
 class AnalizadorDeIps(val ipsSospechosas: List<String>):Analizador(){
     var pedidosDeIPSSospechosas= mutableListOf<Pedido>()
+    fun cantPedidosDeIpSospechosa(ip:String)=respuestasDeServidor.count{it.pedido.ip==ip}
+    fun modulos()=respuestasDeServidor.map{it->it.modulo}//no me acuerdo si repite, probar.
+    fun cantConsultasSospechosasA(modulo: Modulo) = modulo.pedidos.count { ipsSospechosas.contains(it.ip) }
+    fun moduloMasConsultado()=modulos().maxBy{cantConsultasSospechosasA(it)}
+    fun ipsQueRequirieron(ruta:String)=pedidosDeIPSSospechosas.filter{it.ruta()==ruta}.map{} //probar.
+
 
 
 

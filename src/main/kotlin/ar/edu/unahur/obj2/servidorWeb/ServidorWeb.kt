@@ -15,7 +15,7 @@ class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime){
   fun ruta() = url.split(":/").get(1)
   fun extension() = url.split(".").last()
 }
-class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido,modulo: Modulo)
+class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido,val modulo: Modulo)
 
 class ServidorWeb {
   val protocoloAceptado: String = "http:"
