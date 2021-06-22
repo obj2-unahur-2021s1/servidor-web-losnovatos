@@ -10,33 +10,55 @@ enum class CodigoHttp(val codigo: Int) {
   NOT_FOUND(404),
 }
 
-class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime)
-class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido)
+class Pedido(val ip: String, val url: String, val fechaHora: LocalDateTime){
+  fun protocolo() = url.split(":/").get(0)
+  fun ruta() = url.split(":/").get(1)
+  fun extension() = url.split(".").last()
+}
+class Respuesta(val codigo: CodigoHttp, val body: String, val tiempo: Int, val pedido: Pedido,modulo: Modulo)
 
 class ServidorWeb {
   val protocoloAceptado: String = "http:"
   val modulos = mutableListOf<Modulo>()
+  val analizadores= mutableListOf<Analizador>()
   var pedidosRealizados= mutableListOf<Pedido>()
-
-  //Requerimientos 1 y 2 implementados.
-
-  fun realizarPedido(pedido: Pedido): Respuesta {
-    if(!pedido.url.startsWith(protocoloAceptado)) {
-      return Respuesta(CodigoHttp.NOT_IMPLEMENTED, "", 10, pedido)
+  fun hayModuloQueResponda(pedido: Pedido) = modulos.any { it.puedeResponderA(pedido)}
+  fun realizarPedido(pedido: Pedido) =
+    if (hayModuloQueResponda(pedido)&& pedido.protocolo().equals("http")) {
+      moduloQuePuedeResponder(pedido).generarRespuestaA(pedido)
+    } else {
+      noModulo.generarRespuestaA(pedido)
     }
-    val moduloSeleccionado = this.buscarModuloQueSoporteExtension(pedido.url)
-    if(moduloSeleccionado == null) {
-      return Respuesta(CodigoHttp.NOT_FOUND, "", 10, pedido)
-    }
-    pedidosRealizados.add(pedido)
-    return Respuesta(CodigoHttp.OK, moduloSeleccionado.body, moduloSeleccionado.tiempoQueTarda, pedido)
-  }
 
-  fun buscarModuloQueSoporteExtension(url: String): Modulo? {
-    return modulos.find { m -> m.puedeTrabajarCon(url) }
-  }
+
+  fun moduloQuePuedeResponder(pedido: Pedido) = modulos.first { it.puedeResponderA(pedido) }
 }
 
-class Modulo(val extensiones: Collection<String>, val body: String, val tiempoQueTarda: Int) {
+open class Modulo(val extensiones: Collection<String>, val body: String, val tiempoQueTarda: Int) {
+  val respuestas= mutableListOf<Respuesta>()
+  val pedidos= mutableListOf<Pedido>()
+  open fun generarRespuestaA(pedido: Pedido): Respuesta {
+    val respuesta: Respuesta
+    respuesta = Respuesta(CodigoHttp.OK, body, tiempoQueTarda, pedido, this)
+    respuestas.add(respuesta)
+    pedidos.add(pedido)
+    return respuesta
+  }
   fun puedeTrabajarCon(url: String) = extensiones.any { ext -> url.endsWith(ext) }
+  fun puedeResponderA (pedido: Pedido) = extensiones.any { it.equals(pedido.extension())}
 }
+object noModulo: Modulo(extensiones = mutableListOf(), "",10) {
+  override fun generarRespuestaA(pedido: Pedido): Respuesta {
+    val respuesta =
+      if (pedido.protocolo().equals("http")) {
+        Respuesta(CodigoHttp.NOT_FOUND, body, tiempoQueTarda, pedido, this)
+      } else {
+        Respuesta(CodigoHttp.NOT_IMPLEMENTED, body, tiempoQueTarda, pedido, this)
+      }
+
+    respuestas.add(respuesta)
+    pedidos.add(pedido)
+    return respuesta
+  }
+}
+

@@ -7,9 +7,11 @@ abstract class Analizador{
 }
 
 class AnalizadorDeDemora(val demoraMinima:Int) :Analizador(){
-    fun cantidadDeRespuestasDemoradas()=respuestasDeServidor.count { r->r.tiempo>demoraMinima }
+    fun cantidadDeRespuestasDemoradas(modulo: Modulo)=modulo.respuestas.count { r->r.tiempo>demoraMinima }//creo q es con it
 }
 class AnalizadorDeIps(val ipsSospechosas: List<String>):Analizador(){
     var pedidosDeIPSSospechosas= mutableListOf<Pedido>()
+
+
 
 }
