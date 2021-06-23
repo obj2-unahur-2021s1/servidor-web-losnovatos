@@ -17,7 +17,7 @@ class ServidorWebTest : DescribeSpec({
 
     val modulo1 = Modulo(setOf<String>("html"), "modulo web", 5)
     val modulo2 = Modulo(mutableListOf("png", "jpg", "gif"), "img", 15 )
-    val modulo3 = Modulo(mutableListOf("txt", "doc", "docx"), "doc", 50 )
+    val modulo3 = Modulo(mutableListOf("txt", "doc", "csv"), "doc", 50 )
     val analizadorIpSospechosa = AnalizadorDeIps(mutableListOf("107.40.17.8", "207.46.13.5","147.50.27.1"))
     val analizadorDemora=AnalizadorDeDemora(15)
     servidorWeb1.modulos.add(modulo1)
